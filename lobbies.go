@@ -59,6 +59,10 @@ func NewLobby(srv *Server, roomCode string) (*Lobby, error) {
 		return nil, errors.New("too many lobbies")
 	}
 
+	if len(lobbyLevels) == 0 {
+		return nil, errors.New("lobbyLevels is empty")
+	}
+
 	if roomCode == "" {
 		roomCode = LobbyRoomCode(6)
 	}
