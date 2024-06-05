@@ -109,7 +109,7 @@ func LoadWorkshopMaps(steamWorkshopIDs ...uint64) ([]*Level, error) {
 	if err := scmd.Raw(params...); err != nil {
 		return nil, err
 	}
-
+//needed to hard code steamCmdDir
 	for i := 0; i < len(steamWorkshopIDs); i++ {
 		id := fmt.Sprintf("%d", steamWorkshopIDs[i])
 		workshopMap := steamCmdDir + "/steamapps/workshop/content/674940/" + id + "/Level.bin"
@@ -118,7 +118,7 @@ func LoadWorkshopMaps(steamWorkshopIDs ...uint64) ([]*Level, error) {
 			return nil, err
 		}
 	}
-
+//needed to hard code steamCmdDir
 	workshopMaps := make([]*Level, 0)
 	for i := 0; i < len(steamWorkshopIDs); i++ {
 		id := fmt.Sprintf("%d", steamWorkshopIDs[i])
