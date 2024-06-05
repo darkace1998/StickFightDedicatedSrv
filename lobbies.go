@@ -1460,8 +1460,9 @@ func (lobby *Lobby) PlayerTalked(packet *Packet) {
 			lobby.PlayerSaid(playerIndex, fmt.Sprintf("%s", position))
 		case "weapon":
 			if len(cmd) < 2 {
-				lobby.PlayerSaid(playerIndex, "Current weapon:\n%s", string(lobby.Clients[clientIndex].Players[clientPlayerIndex].Weapon.Weapon))
-				return
+				weapon := lobby.Clients[clientIndex].Players[clientPlayerIndex].Weapon.Weapon
+				lobby.PlayerSaid(playerIndex, fmt.Sprintf("Current weapon:\n%s", fmt.Sprint(weapon)))
+			return
 			}
 
 			if lobby.IsOwner(lobby.Clients[clientIndex].SteamID) {
