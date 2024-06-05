@@ -1555,7 +1555,7 @@ func (lobby *Lobby) PlayerTalked(packet *Packet) {
 			err := dstLobby.ClientInit(lobby.Clients[clientIndex].ClientInit)
 			if err != nil {
 				lobby.PlayerSaid(playerIndex, "Error joining lobby!")
-				log.Error("Error joining lobby: %v", err)
+				log.Error(fmt.Sprintf("Error joining lobby: %v", err))
 				break
 			}
 
