@@ -7,14 +7,14 @@ spec:
         arch: amd64
         os: linux
       steps:
-      - name: go_install
+      - name: go_Build
         spec:
           container:
             image: golang:1
           script:
           - go build
         type: run
-      - name: go_test
+      - name: go_Test
         spec:
           container:
             image: golang:1
