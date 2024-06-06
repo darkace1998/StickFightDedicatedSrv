@@ -6,6 +6,13 @@ This repository contains the code for a dedicated server for Stick Fight: The Ga
 
 Stick Fight: The Game is a popular online fighting game. This project aims to provide a dedicated server to enhance the gaming experience. The server is being developed in spare time, so updates may be sporadic.
 
+## Dependencies
+
+- `Steamcmd` : to download the map data
+- `go` : to build/run the server
+- `dotnet-sdk-3.0` : for running the map decoder
+- `libicu-devel` : ICU package for Globalization
+
 ## Repository Structure
 
 Here's a brief overview of the main files and directories in this repository:
