@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-//Lobby holds a Stick Fight lobby
+// Lobby holds a Stick Fight lobby
 type Lobby struct {
 	//We don't want race conditions with such a latent game
 	sync.Mutex
@@ -53,7 +53,7 @@ type Lobby struct {
 	Levels     []*Level  //The Stick Fight maps to rotate through each match
 }
 
-//NewLobby retuns a new lobby
+// NewLobby retuns a new lobby
 func NewLobby(srv *Server, roomCode string) (*Lobby, error) {
 	if len(srv.Lobbies) >= maxLobbies {
 		return nil, errors.New("too many lobbies")
@@ -82,14 +82,14 @@ func NewLobby(srv *Server, roomCode string) (*Lobby, error) {
 	return lobby, nil
 }
 
-//IsRunning returns true if the lobby is currently running
+// IsRunning returns true if the lobby is currently running
 func (lobby *Lobby) IsRunning() bool {
 	lobby.Lock()
 	defer lobby.Unlock()
 	return lobby.Running
 }
 
-//Close closes the lobby
+// Close closes the lobby
 func (lobby *Lobby) Close() {
 	if !lobby.IsRunning() {
 		return
@@ -113,7 +113,7 @@ func (lobby *Lobby) Close() {
 	lobby.Running = false
 }
 
-//BroadcastPacket broadcasts a packet to every client in the lobby, except ignoreAddr if specified
+// BroadcastPacket broadcasts a packet to every client in the lobby, except ignoreAddr if specified
 func (lobby *Lobby) BroadcastPacket(packet *Packet, ignoreAddr *net.UDPAddr) {
 	if !lobby.IsRunning() {
 		return
@@ -139,25 +139,33 @@ func (lobby *Lobby) BroadcastPacket(packet *Packet, ignoreAddr *net.UDPAddr) {
 	}
 }
 
-//IsTeamed checks if two player indexes are on the same team
+// IsTeamed checks if two player indexes are on the same team
 func (lobby *Lobby) IsTeamed(pi1, pi2 int) bool {
 	switch lobby.TeamType {
-		case "ab":
-			for i := 0; i < len(lobby.GetPlayers()); i += 2 {
-				if i == pi1 && i+1 == pi2 { return true }
-				if i == pi2 && i+1 == pi1 { return true }
+	case "ab":
+		for i := 0; i < len(lobby.GetPlayers()); i += 2 {
+			if i == pi1 && i+1 == pi2 {
+				return true
 			}
-		case "ac":
-			for i := 0; i < len(lobby.GetPlayers()); i += 2 {
-				if i == pi1 && i+2 == pi2 { return true }
-				if i == pi2 && i+2 == pi1 { return true }
+			if i == pi2 && i+1 == pi1 {
+				return true
 			}
+		}
+	case "ac":
+		for i := 0; i < len(lobby.GetPlayers()); i += 2 {
+			if i == pi1 && i+2 == pi2 {
+				return true
+			}
+			if i == pi2 && i+2 == pi1 {
+				return true
+			}
+		}
 	}
 
 	return false
 }
 
-//Handle handles a packet in the lobby
+// Handle handles a packet in the lobby
 func (lobby *Lobby) Handle(packet *Packet) {
 	if !lobby.IsRunning() {
 		return
@@ -309,7 +317,7 @@ func (lobby *Lobby) Handle(packet *Packet) {
 	}
 }
 
-//GetMaxHealth returns the maximum and starting health of a player
+// GetMaxHealth returns the maximum and starting health of a player
 func (lobby *Lobby) GetMaxHealth() float32 {
 	switch lobby.Health {
 	case 0:
@@ -331,7 +339,7 @@ func (lobby *Lobby) GetMaxHealth() float32 {
 	return 0
 }
 
-//GetNextWeaponSpawnID returns the next available weaponSpawnID
+// GetNextWeaponSpawnID returns the next available weaponSpawnID
 func (lobby *Lobby) GetNextWeaponSpawnID(beginFromEnd bool) uint16 {
 	if !lobby.IsRunning() {
 		return 0
@@ -363,7 +371,7 @@ func (lobby *Lobby) GetNextWeaponSpawnID(beginFromEnd bool) uint16 {
 	return weaponSpawnID
 }
 
-//GetNextObjectSpawnID returns the next available objectSpawnID
+// GetNextObjectSpawnID returns the next available objectSpawnID
 func (lobby *Lobby) GetNextObjectSpawnID(beginFromEnd bool) uint16 {
 	if !lobby.IsRunning() {
 		return 0
@@ -395,7 +403,7 @@ func (lobby *Lobby) GetNextObjectSpawnID(beginFromEnd bool) uint16 {
 	return objectSpawnID
 }
 
-//GetPlayerCount returns how many players are in this lobby
+// GetPlayerCount returns how many players are in this lobby
 func (lobby *Lobby) GetPlayerCount(excludeSelf bool) int {
 	playerCount := 0
 	if len(lobby.Clients) > 0 {
@@ -409,7 +417,7 @@ func (lobby *Lobby) GetPlayerCount(excludeSelf bool) int {
 	return playerCount
 }
 
-//GetPlayersTooMany returns true if the current player count plus the playersToAdd count exceeds the lobby's maximum player setting
+// GetPlayersTooMany returns true if the current player count plus the playersToAdd count exceeds the lobby's maximum player setting
 func (lobby *Lobby) GetPlayersTooMany(playersToAdd int, excludeSelf bool) bool {
 	if !lobby.IsRunning() {
 		return true
@@ -418,7 +426,7 @@ func (lobby *Lobby) GetPlayersTooMany(playersToAdd int, excludeSelf bool) bool {
 	return lobby.GetPlayerCount(excludeSelf)+playersToAdd > lobby.MaxPlayers
 }
 
-//GetPlayers returns the current player list in order of playerIndex
+// GetPlayers returns the current player list in order of playerIndex
 func (lobby *Lobby) GetPlayers() []*Player {
 	if lobby == nil || lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return make([]*Player, 0)
@@ -443,7 +451,7 @@ func (lobby *Lobby) GetPlayers() []*Player {
 	return playerList
 }
 
-//GetActivePlayers returns the current player list
+// GetActivePlayers returns the current player list
 func (lobby *Lobby) GetActivePlayers() []*Player {
 	playerList := make([]*Player, 0)
 	for _, player := range lobby.GetPlayers() {
@@ -454,7 +462,7 @@ func (lobby *Lobby) GetActivePlayers() []*Player {
 	return playerList
 }
 
-//GetPlayerByIndex returns the player with a matching index
+// GetPlayerByIndex returns the player with a matching index
 func (lobby *Lobby) GetPlayerByIndex(index int) *Player {
 	if lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return nil
@@ -468,7 +476,7 @@ func (lobby *Lobby) GetPlayerByIndex(index int) *Player {
 	return players[index]
 }
 
-//GetNextPlayerIndex returns the next available playerIndex
+// GetNextPlayerIndex returns the next available playerIndex
 func (lobby *Lobby) GetNextPlayerIndex() int {
 	if !lobby.IsRunning() {
 		return -1
@@ -506,7 +514,7 @@ func (lobby *Lobby) GetNextPlayerIndex() int {
 	return nextPlayerIndex
 }
 
-//GetClientByAddr returns the client with a matching address
+// GetClientByAddr returns the client with a matching address
 func (lobby *Lobby) GetClientByAddr(addr *net.UDPAddr) (int, *Client) {
 	if lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return -1, nil
@@ -520,7 +528,7 @@ func (lobby *Lobby) GetClientByAddr(addr *net.UDPAddr) (int, *Client) {
 	return -1, nil
 }
 
-//GetClientBySteamID returns the client with a matching SteamID
+// GetClientBySteamID returns the client with a matching SteamID
 func (lobby *Lobby) GetClientBySteamID(steamID CSteamID) *Client {
 	if lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return nil
@@ -534,7 +542,7 @@ func (lobby *Lobby) GetClientBySteamID(steamID CSteamID) *Client {
 	return nil
 }
 
-//GetClientBySteamUsername returns the client with a matching Steam username
+// GetClientBySteamUsername returns the client with a matching Steam username
 func (lobby *Lobby) GetClientBySteamUsername(steamUsername string) *Client {
 	if lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return nil
@@ -552,7 +560,7 @@ func (lobby *Lobby) GetClientBySteamUsername(steamUsername string) *Client {
 	return nil
 }
 
-//GetIndexesByPlayerIndex returns the index of the client list and the index of the client's player list that matches the specified player index
+// GetIndexesByPlayerIndex returns the index of the client list and the index of the client's player list that matches the specified player index
 func (lobby *Lobby) GetIndexesByPlayerIndex(index int) (int, int) {
 	if lobby.Clients == nil || len(lobby.Clients) == 0 {
 		return -1, -1
@@ -569,7 +577,7 @@ func (lobby *Lobby) GetIndexesByPlayerIndex(index int) (int, int) {
 	return -1, -1
 }
 
-//KickClientBySteamID kicks all clients from the lobby that have a matching SteamID
+// KickClientBySteamID kicks all clients from the lobby that have a matching SteamID
 func (lobby *Lobby) KickClientBySteamID(steamID uint64) {
 	if !lobby.IsRunning() {
 		return
@@ -586,7 +594,7 @@ func (lobby *Lobby) KickClientBySteamID(steamID uint64) {
 	}
 }
 
-//IsInvited returns true if the specified SteamID was invited to the server
+// IsInvited returns true if the specified SteamID was invited to the server
 func (lobby *Lobby) IsInvited(steamID uint64) bool {
 	if !lobby.IsRunning() {
 		return false
@@ -608,7 +616,7 @@ func (lobby *Lobby) IsInvited(steamID uint64) bool {
 	return false
 }
 
-//IsOwner returns true if the specified SteamID is the owner of the lobby
+// IsOwner returns true if the specified SteamID is the owner of the lobby
 func (lobby *Lobby) IsOwner(steamID CSteamID) bool {
 	if !lobby.IsRunning() {
 		return false
@@ -617,7 +625,7 @@ func (lobby *Lobby) IsOwner(steamID CSteamID) bool {
 	return lobby.LobbyOwner.CompareCSteamID(steamID)
 }
 
-//ClientInit initializes a client and returns an error if it fails
+// ClientInit initializes a client and returns an error if it fails
 func (lobby *Lobby) ClientInit(packet *Packet) error {
 	if !lobby.IsRunning() {
 		return errors.New("lobby not running")
@@ -633,7 +641,7 @@ func (lobby *Lobby) ClientInit(packet *Packet) error {
 		return fmt.Errorf("not invited to this lobby")
 	}
 
-	clientPlayerCount := int(packet.ReadByteNext())        //Read in the requested player count
+	clientPlayerCount := int(packet.ReadByteNext()) //Read in the requested player count
 	//if lobby.GetPlayersTooMany(clientPlayerCount, false) { //Check to see if there's enough open spots in the lobby
 	//	return fmt.Errorf("unable to add %d players to lobby with %d/%d players", clientPlayerCount)
 	//}
@@ -644,7 +652,7 @@ func (lobby *Lobby) ClientInit(packet *Packet) error {
 	}
 
 	newClient := NewClient(lobby, packet.Src, steamID, clientPlayerCount, packet) //Create a new client to host the new players
-	if lobby.GetPlayersTooMany(clientPlayerCount, false) { //Check to see if there's enough open spots in the lobby
+	if lobby.GetPlayersTooMany(clientPlayerCount, false) {                        //Check to see if there's enough open spots in the lobby
 		if lobby.DisableSpectate {
 			return fmt.Errorf("unable to add %d players to lobby with %d/%d players", clientPlayerCount, len(lobby.GetPlayers()), lobby.MaxPlayers)
 		}
@@ -707,7 +715,7 @@ func (lobby *Lobby) ClientInit(packet *Packet) error {
 	return nil
 }
 
-//ClientAdd adds the specified client to the lobby as one or more players
+// ClientAdd adds the specified client to the lobby as one or more players
 func (lobby *Lobby) ClientAdd(client *Client) {
 	if lobby.GetPlayersTooMany(client.GetPlayerCount(), false) {
 		return
@@ -729,7 +737,7 @@ func (lobby *Lobby) ClientAdd(client *Client) {
 	}
 }
 
-//SpectatorAdd adds the specified client to the lobby as a spectator
+// SpectatorAdd adds the specified client to the lobby as a spectator
 func (lobby *Lobby) SpectatorAdd(client *Client) {
 	if !lobby.GetPlayersTooMany(client.GetPlayerCount(), false) {
 		lobby.ClientAdd(client) //There's enough open spots, try to let the client play instead
@@ -739,7 +747,7 @@ func (lobby *Lobby) SpectatorAdd(client *Client) {
 	lobby.Spectators = append(lobby.Spectators, client)
 }
 
-//ClientRemoveByClientIndex removes the specified client from the lobby
+// ClientRemoveByClientIndex removes the specified client from the lobby
 func (lobby *Lobby) ClientRemoveByClientIndex(clientIndex int) {
 	if !lobby.IsRunning() {
 		return
@@ -770,7 +778,7 @@ func (lobby *Lobby) ClientRemoveByClientIndex(clientIndex int) {
 	}
 }
 
-//ClientJoined broadcasts to the lobby that the specified player is now part of this lobby
+// ClientJoined broadcasts to the lobby that the specified player is now part of this lobby
 func (lobby *Lobby) ClientJoined(addr *net.UDPAddr, playerIndex int, steamID CSteamID) {
 	if lobby == nil {
 		return
@@ -784,7 +792,7 @@ func (lobby *Lobby) ClientJoined(addr *net.UDPAddr, playerIndex int, steamID CSt
 	log.Info("Client ", steamID, " joined the lobby!")
 }
 
-//ClientLeft broadcasts to the lobby that the specified SteamID is no longer part of this lobby
+// ClientLeft broadcasts to the lobby that the specified SteamID is no longer part of this lobby
 func (lobby *Lobby) ClientLeft(steamID CSteamID) {
 	if lobby == nil {
 		return
@@ -806,7 +814,7 @@ func (lobby *Lobby) ClientLeft(steamID CSteamID) {
 	}
 }
 
-//WorkshopMapsLoaded sends the workshop map cycle to the specified client, or broadcasts if nil
+// WorkshopMapsLoaded sends the workshop map cycle to the specified client, or broadcasts if nil
 func (lobby *Lobby) WorkshopMapsLoaded(addr *net.UDPAddr) {
 	workshopMaps := make([]uint64, 0)
 	for i := 0; i < len(lobby.Levels); i++ {
@@ -833,7 +841,7 @@ func (lobby *Lobby) WorkshopMapsLoaded(addr *net.UDPAddr) {
 	}
 }
 
-//SpawnPlayer spawns the specified player at the specified coordinates
+// SpawnPlayer spawns the specified player at the specified coordinates
 func (lobby *Lobby) SpawnPlayer(index int, posX, posY, rotX, rotY float32) {
 	if !lobby.IsRunning() {
 		return
@@ -870,7 +878,7 @@ func (lobby *Lobby) SpawnPlayer(index int, posX, posY, rotX, rotY float32) {
 	log.Info("Spawned player ", index, " at position {X:", posX, ",Y:", posY, "} with rotation {X:", posX, ",Y:", posY, "} using flag ", flag)
 }
 
-//ReadyUp marks a player as ready
+// ReadyUp marks a player as ready
 func (lobby *Lobby) ReadyUp(packet *Packet) {
 	if !lobby.IsRunning() {
 		return
@@ -895,7 +903,7 @@ func (lobby *Lobby) ReadyUp(packet *Packet) {
 	}
 }
 
-//StartMatch starts the match if all players are ready
+// StartMatch starts the match if all players are ready
 func (lobby *Lobby) StartMatch() {
 	if !lobby.IsRunning() {
 		return
@@ -980,14 +988,14 @@ func (lobby *Lobby) StartMatch() {
 	go lobby.GameMode.StartMatch(lobby)
 }
 
-//MatchInProgress returns true if the match is in progress
+// MatchInProgress returns true if the match is in progress
 func (lobby *Lobby) MatchInProgress() bool {
 	lobby.Lock()         //Try to lock this check, so someone else can change it in sequence instead of it be ignored
 	defer lobby.Unlock() //Unlock after we return the value
 	return !lobby.FightStartTime.IsZero()
 }
 
-//UnReadyAllPlayers unreadies every player
+// UnReadyAllPlayers unreadies every player
 func (lobby *Lobby) UnReadyAllPlayers() {
 	if !lobby.IsRunning() {
 		return
@@ -1002,7 +1010,7 @@ func (lobby *Lobby) UnReadyAllPlayers() {
 	}
 }
 
-//CheckWinner checks to see if the specified playerIndex is the winner, and starts a new match if they are
+// CheckWinner checks to see if the specified playerIndex is the winner, and starts a new match if they are
 func (lobby *Lobby) CheckWinner() {
 	if !lobby.IsRunning() {
 		return
@@ -1044,7 +1052,7 @@ func (lobby *Lobby) CheckWinner() {
 	lobby.CheckingWinner = false
 }
 
-//ChangeMap changes the map and declares the winner
+// ChangeMap changes the map and declares the winner
 func (lobby *Lobby) ChangeMap(mapIndex, winnerIndex int) {
 	if !lobby.IsRunning() {
 		return
@@ -1106,7 +1114,7 @@ func (lobby *Lobby) ChangeMap(mapIndex, winnerIndex int) {
 	log.Info("Changed map: ", lobby.CurrentLevel)
 }
 
-//TempMap assigns a temporary Landfall map to the fight
+// TempMap assigns a temporary Landfall map to the fight
 func (lobby *Lobby) TempMap(sceneIndex int32, winnerIndex int) {
 	if !lobby.IsRunning() {
 		return
@@ -1128,7 +1136,7 @@ func (lobby *Lobby) TempMap(sceneIndex int32, winnerIndex int) {
 	log.Info("Changed map temporarily: ", lobby.CurrentLevel)
 }
 
-//InitMap initializes the map before it can begin
+// InitMap initializes the map before it can begin
 func (lobby *Lobby) InitMap() {
 	if !lobby.IsRunning() {
 		return
@@ -1148,7 +1156,7 @@ func (lobby *Lobby) InitMap() {
 	//lobby.MapObjectsInit()
 }
 
-//ChangeMapSize is called when the map size changes, so that anything which needs to scale can be scaled
+// ChangeMapSize is called when the map size changes, so that anything which needs to scale can be scaled
 func (lobby *Lobby) ChangeMapSize(newSize float32) {
 	if !lobby.IsRunning() {
 		return
@@ -1157,7 +1165,7 @@ func (lobby *Lobby) ChangeMapSize(newSize float32) {
 	lobby.LastAppliedScale = newSize / 10.0
 }
 
-//GroundWeaponsInit reads the current level's list of placed weapons and tells the connected clients that they're pre-spawned
+// GroundWeaponsInit reads the current level's list of placed weapons and tells the connected clients that they're pre-spawned
 func (lobby *Lobby) GroundWeaponsInit() {
 	if !lobby.IsRunning() {
 		return
@@ -1179,7 +1187,7 @@ func (lobby *Lobby) GroundWeaponsInit() {
 	}
 }
 
-//PlayerUpdate syncs a player's network position and weapon
+// PlayerUpdate syncs a player's network position and weapon
 func (lobby *Lobby) PlayerUpdate(packet *Packet) { //420 IQ level strats here, buckle up
 	if !lobby.IsRunning() {
 		return
@@ -1258,7 +1266,7 @@ func (lobby *Lobby) PlayerUpdate(packet *Packet) { //420 IQ level strats here, b
 
 func (lobby *Lobby) DamagePlayer(damagee, attacker int, damage float32, damageType DamageType, particleDirection Vector2) {
 	log.Warn("Player ", damagee, " took ", damage, " damage from player ", attacker, " of type ", damageType)
-	packet := NewPacket(packetTypePlayerTookDamage, (damagee * 2) + 2, 0)
+	packet := NewPacket(packetTypePlayerTookDamage, (damagee*2)+2, 0)
 	packet.Grow(14)
 	packet.WriteByteNext(byte(attacker))
 	packet.WriteF32LENext([]float32{damage, particleDirection.X, particleDirection.Y})
@@ -1268,7 +1276,7 @@ func (lobby *Lobby) DamagePlayer(damagee, attacker int, damage float32, damageTy
 	lobby.Server.SendPacket(packet, lobby.Clients[damageeClientIndex].Addr)
 }
 
-//PlayerTookDamage syncs a player willingly admitting that they took damage
+// PlayerTookDamage syncs a player willingly admitting that they took damage
 func (lobby *Lobby) PlayerTookDamage(packet *Packet) {
 	if !lobby.IsRunning() {
 		return
@@ -1335,7 +1343,7 @@ func (lobby *Lobby) PlayerTookDamage(packet *Packet) {
 	if lobby.IsTeamed(playerIndex, attackerIndex) {
 		log.Warn("Player ", playerIndex, " avoided ", damage, " damage from ", attackerIndex, " thanks to friendly fire! (Team state: ", lobby.TeamType, ")")
 		for i := 0; i < 5; i++ {
-			lobby.DamagePlayer(playerIndex, attackerIndex, damage * -1, damageType, particleDirection) //"Heal" the player by dealing negative damage
+			lobby.DamagePlayer(playerIndex, attackerIndex, damage*-1, damageType, particleDirection) //"Heal" the player by dealing negative damage
 		}
 		return
 	}
@@ -1376,7 +1384,7 @@ func (lobby *Lobby) PlayerTookDamage(packet *Packet) {
 	}
 }
 
-//PlayerFallOut syncs a player falling out of bounds
+// PlayerFallOut syncs a player falling out of bounds
 func (lobby *Lobby) PlayerFallOut(packet *Packet) {
 	if !lobby.IsRunning() {
 		return
@@ -1417,7 +1425,7 @@ func (lobby *Lobby) PlayerFallOut(packet *Packet) {
 	lobby.CheckWinner()
 }
 
-//PlayerTalked syncs a player's chat message and processes chat commands
+// PlayerTalked syncs a player's chat message and processes chat commands
 func (lobby *Lobby) PlayerTalked(packet *Packet) {
 	if !lobby.IsRunning() {
 		return
@@ -1620,16 +1628,16 @@ func (lobby *Lobby) PlayerTalked(packet *Packet) {
 			}
 
 			if !lobby.IsOwner(lobby.Clients[clientIndex].SteamID) {
-				lobby.PlayerSaid(playerIndex, "Team: " + lobby.TeamType)
+				lobby.PlayerSaid(playerIndex, "Team: "+lobby.TeamType)
 				break
 			}
 
 			switch cmd[1] {
-				case "ab", "ac", "abc", "abd", "bcd", "fff":
-					lobby.TeamType = cmd[1]
-					lobby.PlayerSaid(playerIndex, "Set team: " + lobby.TeamType)
-				default:
-					lobby.PlayerSaid(playerIndex, "Invalid team type!")
+			case "ab", "ac", "abc", "abd", "bcd", "fff":
+				lobby.TeamType = cmd[1]
+				lobby.PlayerSaid(playerIndex, "Set team: "+lobby.TeamType)
+			default:
+				lobby.PlayerSaid(playerIndex, "Invalid team type!")
 			}
 
 		case "resume", "ready":
@@ -1863,7 +1871,7 @@ func (lobby *Lobby) PlayerTalked(packet *Packet) {
 	}
 }
 
-//PlayerSaid pretends a player said something out loud
+// PlayerSaid pretends a player said something out loud
 func (lobby *Lobby) PlayerSaid(playerIndex int, msg string, data ...interface{}) {
 	if !lobby.IsRunning() {
 		return
@@ -1883,7 +1891,7 @@ func (lobby *Lobby) PlayerSaid(playerIndex int, msg string, data ...interface{})
 	log.Trace("#[CHAT:", lobby.Clients[clientIndex].SteamID.ID, "] ", lobby.Clients[clientIndex].SteamID.GetUsername(), ": ", string(respBytes))
 }
 
-//PlayerThought pretends a player said something to themselves, where no one else can hear them
+// PlayerThought pretends a player said something to themselves, where no one else can hear them
 func (lobby *Lobby) PlayerThought(playerIndex int, msg string, data ...interface{}) {
 	if !lobby.IsRunning() {
 		return
@@ -1903,7 +1911,7 @@ func (lobby *Lobby) PlayerThought(playerIndex int, msg string, data ...interface
 	log.Trace("#[CHAT:", lobby.Clients[clientIndex].SteamID.ID, "] ", lobby.Clients[clientIndex].SteamID.GetUsername(), ": ", string(respBytes))
 }
 
-//SpawnWeapon spawns the specified weapon on the map
+// SpawnWeapon spawns the specified weapon on the map
 func (lobby *Lobby) SpawnWeapon(weaponID Weapon, weaponSpawnPos Vector3) {
 	if !lobby.IsRunning() {
 		return
@@ -1929,7 +1937,7 @@ func (lobby *Lobby) SpawnWeapon(weaponID Weapon, weaponSpawnPos Vector3) {
 	log.Info("Spawned weapon ", weaponID, " at position ", weaponSpawnPos)
 }
 
-//SpawnWeapons spawns a list of weapons at the specified positions on the map
+// SpawnWeapons spawns a list of weapons at the specified positions on the map
 func (lobby *Lobby) SpawnWeapons(weapons []Weapon, weaponSpawnPositions []Vector3) {
 	if !lobby.IsRunning() {
 		return
@@ -1948,7 +1956,7 @@ func (lobby *Lobby) SpawnWeapons(weapons []Weapon, weaponSpawnPositions []Vector
 	}
 }
 
-//SpawnWeaponRandom spawns a random weapon on the map
+// SpawnWeaponRandom spawns a random weapon on the map
 func (lobby *Lobby) SpawnWeaponRandom() {
 	if !lobby.IsRunning() {
 		return
@@ -1984,7 +1992,7 @@ func (lobby *Lobby) SpawnWeaponRandom() {
 	lobby.SpawnWeapons(weapons, weaponSpawnPositions)
 }
 
-//UpdateWeapon updates a player's weapon
+// UpdateWeapon updates a player's weapon
 func (lobby *Lobby) UpdateWeapon(playerIndex int, weapon Weapon) {
 	clientIndex, clientPlayerIndex := lobby.GetIndexesByPlayerIndex(playerIndex)
 	if clientIndex <= -1 || clientPlayerIndex <= -1 {

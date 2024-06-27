@@ -13,7 +13,7 @@ var (
 	lobbyLevels   = make([]*Level, 0)
 )
 
-//Level holds a Stick Fight level
+// Level holds a Stick Fight level
 type Level struct {
 	//Map identification
 	levelType       byte   //0 = Landfall, 1 = Local, 2 = Workshop (CustomOnline), 3 = Streamed (CustomStream)
@@ -102,7 +102,7 @@ func newLevelCustomStream(path string, data []byte) *Level {
 	return level
 }
 
-//Load loads the Stick Fight map into memory
+// Load loads the Stick Fight map into memory
 func (m *Level) Load() error {
 	switch m.levelType {
 	case 0:
@@ -127,12 +127,12 @@ func (m *Level) Load() error {
 	return nil
 }
 
-//Type returns the Stick Fight map type
+// Type returns the Stick Fight map type
 func (m *Level) Type() byte {
 	return m.levelType
 }
 
-//Data returns the Stick Fight map as bytes
+// Data returns the Stick Fight map as bytes
 func (m *Level) Data() []byte {
 	dataBuf := crunch.NewBuffer()
 
@@ -152,7 +152,7 @@ func (m *Level) Data() []byte {
 	return m.data //Return Level data if unsupported handling
 }
 
-//Size returns the size of the map data
+// Size returns the size of the map data
 func (m *Level) Size() int32 {
 	switch m.levelType {
 	case 0:
@@ -179,7 +179,7 @@ func (m *Level) String() string {
 	return fmt.Sprintf("%d: %v", int(m.Type()), m.Data())
 }
 
-//IsLobby returns true if the map is a Landfall map with sceneIndex 0
+// IsLobby returns true if the map is a Landfall map with sceneIndex 0
 func (m *Level) IsLobby() bool {
 	switch m.levelType {
 	case 0:
@@ -196,7 +196,7 @@ func (m *Level) IsLobby() bool {
 	return false
 }
 
-//IsStats returns true if the map is a Landfall map with sceneIndex 102
+// IsStats returns true if the map is a Landfall map with sceneIndex 102
 func (m *Level) IsStats() bool {
 	return m.levelType == 0 && m.sceneIndex == 102
 }

@@ -16,7 +16,7 @@ var (
 	swears = []string{" "}
 )
 
-//Server holds a Stick Fight dedicated server
+// Server holds a Stick Fight dedicated server
 type Server struct {
 	Addr string
 
@@ -28,16 +28,16 @@ type Server struct {
 	Filter  *swearfilter.SwearFilter
 }
 
-//Status holds server statistics
+// Status holds server statistics
 type Status struct {
-	Address string `json:"address"`
-	Online bool `json:"online"`
-	Lobbies int `json:"lobbies"`
-	MaxLobbies int `json:"maxLobbies"`
-	Players int `json:"playersOnline"`
+	Address    string `json:"address"`
+	Online     bool   `json:"online"`
+	Lobbies    int    `json:"lobbies"`
+	MaxLobbies int    `json:"maxLobbies"`
+	Players    int    `json:"playersOnline"`
 }
 
-//NewServer returns a new server running on the specified UDP address
+// NewServer returns a new server running on the specified UDP address
 func NewServer(addr string) *Server {
 	srv := &Server{
 		Addr:    addr,
@@ -48,7 +48,7 @@ func NewServer(addr string) *Server {
 	return srv
 }
 
-//Status returns the current server statistics
+// Status returns the current server statistics
 func (srv *Server) Status() *Status {
 	players := 0
 	for i := 0; i < len(srv.Lobbies); i++ {
@@ -56,20 +56,20 @@ func (srv *Server) Status() *Status {
 	}
 
 	return &Status{
-		Address: srv.Addr,
-		Online: srv.Running,
-		Lobbies: len(srv.Lobbies),
+		Address:    srv.Addr,
+		Online:     srv.Running,
+		Lobbies:    len(srv.Lobbies),
 		MaxLobbies: maxLobbies,
-		Players: players,
+		Players:    players,
 	}
 }
 
-//IsRunning returns true if the server is currently running
+// IsRunning returns true if the server is currently running
 func (srv *Server) IsRunning() bool {
 	return srv.Running
 }
 
-//Close closes the server
+// Close closes the server
 func (srv *Server) Close() {
 	if !srv.IsRunning() {
 		return
@@ -86,7 +86,7 @@ func (srv *Server) Close() {
 	srv.Running = false
 }
 
-//Run starts the server and ticks it until it's closed
+// Run starts the server and ticks it until it's closed
 func (srv *Server) Run() {
 	if srv.Running {
 		srv.Close()
@@ -135,7 +135,7 @@ func (srv *Server) Run() {
 	}
 }
 
-//ReadPackets starts reading packets and handles them
+// ReadPackets starts reading packets and handles them
 func (srv *Server) ReadPackets() {
 	buffer := make([]byte, maxBufferSize)
 
@@ -162,7 +162,7 @@ func (srv *Server) ReadPackets() {
 	}
 }
 
-//ReadHTTP starts reading HTTP packets and handles them
+// ReadHTTP starts reading HTTP packets and handles them
 func (srv *Server) ReadHTTP() {
 	buffer := make([]byte, maxBufferSize)
 
@@ -210,12 +210,12 @@ func (srv *Server) ReadHTTP() {
 			continue
 		}*/
 		resp := &http.Response{
-			Status: "200 OK",
-			StatusCode: 200,
-			Proto: "HTTP/1.1",
-			ProtoMajor: 1,
-			ProtoMinor: 1,
-			Body: io.NopCloser(bufio.NewReader(packet)),
+			Status:        "200 OK",
+			StatusCode:    200,
+			Proto:         "HTTP/1.1",
+			ProtoMajor:    1,
+			ProtoMinor:    1,
+			Body:          io.NopCloser(bufio.NewReader(packet)),
 			ContentLength: int64(len(packet.Bytes())),
 		}
 
@@ -237,7 +237,7 @@ func (srv *Server) ReadHTTP() {
 	}
 }
 
-//SendPacket sends a packet to a destination address
+// SendPacket sends a packet to a destination address
 func (srv *Server) SendPacket(packet *Packet, addr *net.UDPAddr) {
 	srv.Sock.WriteToUDP(packet.AsBytes(), addr)
 
@@ -246,7 +246,7 @@ func (srv *Server) SendPacket(packet *Packet, addr *net.UDPAddr) {
 	}
 }
 
-//Handle handles a packet for the server
+// Handle handles a packet for the server
 func (srv *Server) Handle(buffer []byte, addr *net.UDPAddr) {
 	//Read the buffer into a packet
 	packet, err := NewPacketFromBytes(buffer)
@@ -311,7 +311,7 @@ func (srv *Server) Handle(buffer []byte, addr *net.UDPAddr) {
 	}
 }
 
-//ClientPong responds to a ping with a pong
+// ClientPong responds to a ping with a pong
 func (srv *Server) ClientPong(addr *net.UDPAddr, data []byte) {
 	packetPingResponse := NewPacket(packetTypePingResponse, 0, 0)
 	if dataLen := int64(len(data)); dataLen > 0 {
@@ -321,14 +321,14 @@ func (srv *Server) ClientPong(addr *net.UDPAddr, data []byte) {
 	srv.SendPacket(packetPingResponse, addr)
 }
 
-//ClientAccept accepts a client
+// ClientAccept accepts a client
 func (srv *Server) ClientAccept(addr *net.UDPAddr) {
 	packetClientAccepted := NewPacket(packetTypeClientAccepted, 1, 0)
 	srv.SendPacket(packetClientAccepted, addr)
 	log.Debug("Accepted client ", addr)
 }
 
-//ClientReject rejects a client
+// ClientReject rejects a client
 func (srv *Server) ClientReject(addr *net.UDPAddr, reason string) {
 	packetClientInit := NewPacket(packetTypeClientInit, 0, 0)
 	packetClientInit.Grow(1)
@@ -345,7 +345,7 @@ func (srv *Server) ClientReject(addr *net.UDPAddr, reason string) {
 	}
 }
 
-//GetLobbyByAddr returns the lobby that the address is found in
+// GetLobbyByAddr returns the lobby that the address is found in
 func (srv *Server) GetLobbyByAddr(addr *net.UDPAddr) *Lobby {
 	if len(srv.Lobbies) > 0 {
 		for i := 0; i < len(srv.Lobbies); i++ {
@@ -364,7 +364,7 @@ func (srv *Server) GetLobbyByAddr(addr *net.UDPAddr) *Lobby {
 	return nil
 }
 
-//GetLobbyByCode returns the lobby matching the room code
+// GetLobbyByCode returns the lobby matching the room code
 func (srv *Server) GetLobbyByCode(code string) *Lobby {
 	if len(srv.Lobbies) > 0 {
 		for i := 0; i < len(srv.Lobbies); i++ {
@@ -377,12 +377,12 @@ func (srv *Server) GetLobbyByCode(code string) *Lobby {
 	return nil
 }
 
-//LobbyAdd adds the specified lobby to the server
+// LobbyAdd adds the specified lobby to the server
 func (srv *Server) LobbyAdd(lobby *Lobby) {
 	srv.Lobbies = append(srv.Lobbies, lobby)
 }
 
-//GetClientByAddr returns the client with a matching address
+// GetClientByAddr returns the client with a matching address
 func (srv *Server) GetClientByAddr(addr *net.UDPAddr) (int, *Client) {
 	for _, lobby := range srv.Lobbies {
 		if lobby.Clients == nil || len(lobby.Clients) == 0 {
@@ -398,7 +398,7 @@ func (srv *Server) GetClientByAddr(addr *net.UDPAddr) (int, *Client) {
 	return -1, nil
 }
 
-//GetClientBySteamID returns the client with a matching SteamID
+// GetClientBySteamID returns the client with a matching SteamID
 func (srv *Server) GetClientBySteamID(steamID CSteamID) *Client {
 	for _, lobby := range srv.Lobbies {
 		if lobby.Clients == nil || len(lobby.Clients) == 0 {
@@ -414,7 +414,7 @@ func (srv *Server) GetClientBySteamID(steamID CSteamID) *Client {
 	return nil
 }
 
-//GetClientBySteamUsername returns the client with a matching Steam username
+// GetClientBySteamUsername returns the client with a matching Steam username
 func (srv *Server) GetClientBySteamUsername(steamUsername string) *Client {
 	for _, lobby := range srv.Lobbies {
 		if lobby.Clients == nil || len(lobby.Clients) == 0 {
@@ -434,7 +434,7 @@ func (srv *Server) GetClientBySteamUsername(steamUsername string) *Client {
 	return nil
 }
 
-//HasSwear checks if the given message has a swear
+// HasSwear checks if the given message has a swear
 func (srv *Server) HasSwear(message string) (tripped bool) {
 	trippedWords, err := srv.Filter.Check(message)
 	if err != nil {

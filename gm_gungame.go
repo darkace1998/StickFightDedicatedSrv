@@ -43,7 +43,7 @@ func (gm GunGame) GetWeapons() []Weapon {
 //GetWeaponSpawnRates returns the allowed weapon spawn rates for a tournament
 func (gm GunGame) GetWeaponSpawnRates() []WeaponSpawnRate {
 	return []WeaponSpawnRate{
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 0,
 			MaximumSeconds: 0,
 		},

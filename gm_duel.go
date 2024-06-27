@@ -43,7 +43,7 @@ func (gm Duel) GetWeapons() []Weapon {
 //GetWeaponSpawnRates returns the allowed weapon spawn rates for a duel
 func (gm Duel) GetWeaponSpawnRates() []WeaponSpawnRate {
 	return []WeaponSpawnRate{
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 3,
 			MaximumSeconds: 5,
 		},
@@ -63,7 +63,7 @@ func (gm Duel) StartMatch(lobby *Lobby) {
 			break
 		}
 
-		if int(time.Now().Sub(lastWeaponSpawn)/time.Second) >= weaponSpawnWait {
+		if int(time.Since(lastWeaponSpawn)/time.Second) >= weaponSpawnWait {
 			lobby.SpawnWeaponRandom()
 
 			weaponSpawnWait = randomizer.Intn(gm.GetWeaponSpawnRates()[0].MaximumSeconds-gm.GetWeaponSpawnRates()[0].MinimumSeconds+1) + gm.GetWeaponSpawnRates()[0].MinimumSeconds

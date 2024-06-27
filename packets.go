@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"time"
 
-	crunch "github.com/superwhiskers/crunch/v3"
 	"github.com/JoshuaDoes/json"
+	crunch "github.com/superwhiskers/crunch/v3"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 	eophSize = 9
 )
 
-//Packet holds a Stick Fight network packet
+// Packet holds a Stick Fight network packet
 type Packet struct {
 	*crunch.Buffer //Holds the data buffer, and provides additional methods to directly read and write on this buffer
 
@@ -43,18 +43,18 @@ func (packet *Packet) Read(p []byte) (n int, err error) {
 		if (start + i) >= len(packetBytes) {
 			return packet.pos - start, io.EOF
 		}
-		p[i] = packetBytes[start + i]
+		p[i] = packetBytes[start+i]
 		packet.pos++
 	}
 	return packet.pos - start, nil
 }
 
-//NewPacket returns a new deserialized Stick Fight network packet
+// NewPacket returns a new deserialized Stick Fight network packet
 func NewPacket(packetType PacketType, channel int, steamID uint64) *Packet {
 	return &Packet{crunch.NewBuffer(make([]byte, 0)), uint32(time.Now().Unix()), nil, channel, NewCSteamID(steamID), packetType, 0}
 }
 
-//NewPacketFromBytes returns a Stick Fight network packet deserialized from bytes
+// NewPacketFromBytes returns a Stick Fight network packet deserialized from bytes
 func NewPacketFromBytes(data []byte) (packet *Packet, err error) {
 	if len(data) < sophSize+eophSize {
 		return nil, errors.New("packet size too small")
@@ -65,7 +65,7 @@ func NewPacketFromBytes(data []byte) (packet *Packet, err error) {
 
 	//Determine if we're dealing with HTTP GET requests first
 	test := buf.ReadBytesNext(3) //GET is 3 bytes
-	buf.SeekByte(0, false) //Reset our position in the buffer
+	buf.SeekByte(0, false)       //Reset our position in the buffer
 	if string(test) == "GET" {
 		packetGet := NewPacket(packetTypeHTTP, 0, 0)
 		packetGet.Grow(int64(len(data)))
@@ -76,7 +76,8 @@ func NewPacketFromBytes(data []byte) (packet *Packet, err error) {
 		}
 
 		switch req.URL.Path {
-			case "/status": {
+		case "/status":
+			{
 				packetStatus := NewPacket(packetTypeHTTP, 0, 0)
 				statusJSON, err := json.Marshal(server.Status(), false)
 				if err != nil {
@@ -125,7 +126,7 @@ func (packet *Packet) String() string {
 	return str
 }
 
-//AsBytes returns a Stick Fight network packet serialized as bytes
+// AsBytes returns a Stick Fight network packet serialized as bytes
 func (packet *Packet) AsBytes() []byte {
 	dataLen := int(packet.ByteCapacity())
 	buf := crunch.NewBuffer(make([]byte, sophSize+dataLen+eophSize))
@@ -141,7 +142,7 @@ func (packet *Packet) AsBytes() []byte {
 	return buf.Bytes()
 }
 
-//ShouldLog returns true if this packet should be logged
+// ShouldLog returns true if this packet should be logged
 func (packet *Packet) ShouldLog() bool {
 	switch packet.Type {
 	case packetTypePlayerUpdate:
@@ -153,7 +154,7 @@ func (packet *Packet) ShouldLog() bool {
 	return true
 }
 
-//ShouldCheckTime returns true if this packet should have its timestamp checked
+// ShouldCheckTime returns true if this packet should have its timestamp checked
 func (packet *Packet) ShouldCheckTime() bool {
 	switch packet.Type {
 	case packetTypePing, packetTypePingResponse, packetTypeClientReadyUp, packetTypePlayerUpdate, packetTypePlayerTalked, packetTypePlayerForceAdded, packetTypePlayerForceAddedAndBlock, packetTypePlayerLavaForceAdded, packetTypePlayerFallOut, packetTypePlayerWonWithRicochet, packetTypePlayerTookDamage, packetTypeClientRequestingWeaponThrow:
@@ -163,7 +164,7 @@ func (packet *Packet) ShouldCheckTime() bool {
 	return true
 }
 
-//PacketType is the type of a packet, which determines how to interpret the data associated with the packet
+// PacketType is the type of a packet, which determines how to interpret the data associated with the packet
 type PacketType byte
 
 func (packetType PacketType) String() string {

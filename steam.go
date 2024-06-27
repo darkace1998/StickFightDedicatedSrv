@@ -2,30 +2,30 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"io/ioutil"
 	"regexp"
 	"unicode"
 
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 	"github.com/JoshuaDoes/json"
 	"github.com/Philipp15b/go-steamapi"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 var (
 	steamUsernames = make(map[uint64]string)
 )
 
-//CSteamID holds a Steam client ID and its username
+// CSteamID holds a Steam client ID and its username
 type CSteamID struct {
 	ID           uint64
 	Username     string
 	NormUsername string
 }
 
-//NewCSteamID returns a new Steam client ID
+// NewCSteamID returns a new Steam client ID
 func NewCSteamID(steamID uint64) CSteamID {
 	clientID := CSteamID{
 		ID: steamID,
@@ -34,7 +34,7 @@ func NewCSteamID(steamID uint64) CSteamID {
 	return clientID
 }
 
-//GetUsername returns the username of the CSteamID and caches it in memory
+// GetUsername returns the username of the CSteamID and caches it in memory
 func (cSteamID CSteamID) GetUsername() string {
 	if cSteamID.Username != "" {
 		return cSteamID.Username
@@ -59,7 +59,7 @@ func (cSteamID CSteamID) GetUsername() string {
 	return cSteamID.Username
 }
 
-//GetNormalizedUsername returns a normalized version of the username of the CSteamID and caches it in memory
+// GetNormalizedUsername returns a normalized version of the username of the CSteamID and caches it in memory
 func (cSteamID CSteamID) GetNormalizedUsername() string {
 	if cSteamID.NormUsername != "" {
 		return cSteamID.NormUsername
@@ -84,17 +84,17 @@ func (cSteamID CSteamID) GetNormalizedUsername() string {
 	return cSteamID.NormUsername
 }
 
-//CompareCSteamID evaluates if a CSteamID is the same as another
+// CompareCSteamID evaluates if a CSteamID is the same as another
 func (cSteamID CSteamID) CompareCSteamID(compareSteamID CSteamID) bool {
 	return cSteamID.ID == compareSteamID.ID
 }
 
-//CompareSteamID evaluates if a CSteamID matches a SteamID
+// CompareSteamID evaluates if a CSteamID matches a SteamID
 func (cSteamID CSteamID) CompareSteamID(steamID uint64) bool {
 	return cSteamID.ID == steamID
 }
 
-//LoadWorkshopMaps updates and preloads a given list of Workshop maps in a batch command
+// LoadWorkshopMaps updates and preloads a given list of Workshop maps in a batch command
 func LoadWorkshopMaps(steamWorkshopIDs ...uint64) ([]*Level, error) {
 	workshopItem := []string{"+workshop_download_item", "674940"}
 	params := make([]string, 0)
@@ -113,7 +113,7 @@ func LoadWorkshopMaps(steamWorkshopIDs ...uint64) ([]*Level, error) {
 	for i := 0; i < len(steamWorkshopIDs); i++ {
 		id := fmt.Sprintf("%d", steamWorkshopIDs[i])
 		workshopMap := steamCmdDir + "/steamapps/workshop/content/674940/" + id + "/Level.bin"
-		
+
 		if _, err := os.Stat(workshopMap); os.IsNotExist(err) {
 			return nil, err
 		}

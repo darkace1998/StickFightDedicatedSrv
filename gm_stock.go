@@ -32,19 +32,19 @@ func (gm Stock) GetWeapons() []Weapon {
 //GetWeaponSpawnRates returns the allowed weapon spawn rates for a tournament
 func (gm Stock) GetWeaponSpawnRates() []WeaponSpawnRate {
 	return []WeaponSpawnRate{
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 5,
 			MaximumSeconds: 8,
 		},
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 3,
 			MaximumSeconds: 5,
 		},
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 0,
 			MaximumSeconds: 0,
 		},
-		WeaponSpawnRate{
+		{
 			MinimumSeconds: 8,
 			MaximumSeconds: 12,
 		},
